@@ -6,7 +6,6 @@ from keyboards.keyboards import kb_main_menu
 from keyboards.keyboards_menu import kb_menu
 from keyboards.keyboards_bank import replenish_bank
 
-
 router = Router()
 
 
@@ -42,5 +41,3 @@ async def support_text(msg: Message):
 @router.message(F.text == "Меню")
 async def main_menu(msg: Message):
     await msg.reply(text="Вы вернулись на главное меню!", reply_markup=kb_menu)
-
-

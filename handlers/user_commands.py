@@ -5,6 +5,10 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from keyboards.keyboards_menu import kb_menu
 from lexicon.lexicon_ru import start_text
+
+from keyboards.keyboards_menu import kb_menu
+
+
 router = Router()
 
 
@@ -16,4 +20,4 @@ async def start_handler(msg: Message):
 
 @router.message(Command("menu"))
 async def menu_handler(msg: Message):
-    await msg.answer(text='Вы попали в главное меню!')
+    await msg.answer(text='Вы попали в главное меню!', reply_markup=kb_menu)
