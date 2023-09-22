@@ -3,7 +3,6 @@ import datetime
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-
 from keyboards.keyboards_menu import kb_menu
 from lexicon.lexicon_ru import start_text
 router = Router()
