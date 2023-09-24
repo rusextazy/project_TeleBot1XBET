@@ -4,7 +4,7 @@ from aiogram.types import Message, FSInputFile
 from aiogram.fsm.state import State, StatesGroup
 
 from keyboards.keyboards_menu import kb_menu
-from keyboards.keyboards import exit_oplatil
+from keyboards.keyboards import exit_oplatil, adms
 from lexicon import lexicon_ru
 
 router = Router()
@@ -16,6 +16,20 @@ class REPLENISHMENT(StatesGroup):
     ID = State()
     SCREEN = State()
     EXAMINATION = State()
+
+
+@router.callback_query(F.data.in_(('yes', 'no')))
+async def process_callback(callback: types.CallbackQuery, bot: Bot,):
+    if callback.data == 'yes':
+        await bot.send_message(chat_id=id_message, text="✅")
+        await bot.send_message(chat_id=id_message, text="Пополнение на счет по введенным вами реквизитам прошел успешно!✅\nСпасибо что используете нашу кассу!🤗")
+        await bot.send_message(chat_id='-1001838527137', text="Одобрено")
+    elif callback.data == 'no':
+        await bot.send_message(chat_id=id_message, text="❌")
+        await bot.send_message(chat_id=id_message, text="Ваш перевод до сих пор не поступил!❌\nПожалуйста проверьте правильно ли вы ввели реквизиты.")
+        await bot.send_message(chat_id='-1001838527137', text="Отклонено")
+    await callback.message.delete_reply_markup()
+    await callback.answer()
 
 
 @router.callback_query(F.data.in_(('mbank_popolnit', 'elkart_popolnit', 'opima_popolnit', 'terminal_popolnit')))
@@ -89,13 +103,21 @@ async def get_screen_replenishment(msg: Message, state: FSMContext):
 
 
 @router.message(REPLENISHMENT.EXAMINATION)
-async def get_examination_replenishment(msg: Message, state: FSMContext):
+async def get_examination_replenishment(msg: Message, bot: Bot, state: FSMContext):
     await state.update_data(language=msg.text)
     screen_replenishment = msg.photo[-1].file_id
     id_rab_id = await state.update_data()
     summa_rab_sum = await state.get_data()
     summa_rab_prov = await state.get_data()
-
     await msg.answer(lexicon_ru.oplata.format(id_xbet=id_rab_id['id'], summa=summa_rab_sum['summa'], sposob=summa_rab_prov['prover']))
     await msg.answer(text="❤️", reply_markup=kb_menu)
+    await bot.send_message(chat_id='-1001838527137',
+                           text=lexicon_ru.proverk_adm_replenishment.format(id=msg.from_user.id, name=msg.from_user.full_name,
+                                                              user=msg.from_user.username, id_1xbet=id_rab_id['id'],
+                                                              summa=summa_rab_sum['summa'], sposob=summa_rab_prov['prover']), reply_markup=adms)
+    await bot.send_photo(chat_id='-1001838527137', photo=screen_replenishment)
+    global id_message
+    id_message = msg.chat.id
     await state.clear()
+
+#ИСПРАВИТЬ ID_MESSAGE
