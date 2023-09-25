@@ -37,3 +37,23 @@ proverk_adm_replenishment = """
 1XBET_ID: {id_1xbet}
 Сумма: {summa}
 Способ пополнения: {sposob}"""
+
+
+odobreno_adm_replenishment = """
+--------------------------------
+(ЗАЯВКА ОДОБРЕНА!)
+
+Чат ID: {id}
+Чел: {name}
+Чел(кликабельно): @{user}
+"""
+
+
+otkloneno_adm_replenishment = """
+--------------------------------
+(ЗАЯВКА ОТКЛОНЕНА!)
+
+Чат ID: {id}
+Чел: {name}
+Чел(кликабельно): @{user}
+"""

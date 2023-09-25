@@ -18,20 +18,6 @@ class REPLENISHMENT(StatesGroup):
     EXAMINATION = State()
 
 
-@router.callback_query(F.data.in_(('yes', 'no')))
-async def process_callback(callback: types.CallbackQuery, bot: Bot,):
-    if callback.data == 'yes':
-        await bot.send_message(chat_id=id_message, text="✅")
-        await bot.send_message(chat_id=id_message, text="Пополнение на счет по введенным вами реквизитам прошел успешно!✅\nСпасибо что используете нашу кассу!🤗")
-        await bot.send_message(chat_id='-1001838527137', text="Одобрено")
-    elif callback.data == 'no':
-        await bot.send_message(chat_id=id_message, text="❌")
-        await bot.send_message(chat_id=id_message, text="Ваш перевод до сих пор не поступил!❌\nПожалуйста проверьте правильно ли вы ввели реквизиты.")
-        await bot.send_message(chat_id='-1001838527137', text="Отклонено")
-    await callback.message.delete_reply_markup()
-    await callback.answer()
-
-
 @router.callback_query(F.data.in_(('mbank_popolnit', 'elkart_popolnit', 'opima_popolnit', 'terminal_popolnit')))
 async def process_callback(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data()
@@ -48,6 +34,25 @@ async def process_callback(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(text='Вы выбрали Терминал')
         await callback.message.answer(text='Укажите сумму пополнения COM🇰🇬')
     await state.set_state(REPLENISHMENT.PROVER)
+    await callback.answer()
+
+
+@router.callback_query(F.data.in_(('yes', 'no')))
+async def process_callback(callback: types.CallbackQuery, bot: Bot, state: FSMContext):
+
+    if callback.data == 'yes':
+        await bot.send_message(chat_id=id_message, text="✅")
+        await bot.send_message(chat_id=id_message, text="Пополнение на счет по введенным вами реквизитам прошел успешно!✅\nСпасибо что используете нашу кассу!🤗")
+        await bot.send_message(chat_id='-1001838527137', text=lexicon_ru.odobreno_adm_replenishment.format(id=id_message,
+                                                                                                            name=chel_message,
+                                                                                                            user=user_message))
+    elif callback.data == 'no':
+        await bot.send_message(chat_id=id_message, text="❌")
+        await bot.send_message(chat_id=id_message, text="Ваш перевод до сих пор не поступил!❌\nПожалуйста проверьте правильно ли вы ввели реквизиты.")
+        await bot.send_message(chat_id='-1001838527137', text=lexicon_ru.otkloneno_adm_replenishment.format(id=id_message,
+                                                                                                            name=chel_message,
+                                                                                                            user=user_message))
+    await callback.message.delete_reply_markup()
     await callback.answer()
 
 
@@ -118,6 +123,11 @@ async def get_examination_replenishment(msg: Message, bot: Bot, state: FSMContex
     await bot.send_photo(chat_id='-1001838527137', photo=screen_replenishment)
     global id_message
     id_message = msg.chat.id
+    global chel_message
+    chel_message = msg.from_user.full_name
+    global user_message
+    user_message = msg.from_user.username
     await state.clear()
 
-#ИСПРАВИТЬ ID_MESSAGE
+
+#ИСПРАВИТЬ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
